@@ -1,0 +1,11 @@
+.dashboard{
+    display: flex;
+    border: 2px solid red;
+    gap: 20px;
+    width: 100%;
+    height: 100dvh;
+}
+.dash-main{
+    border: 2px solid blue;
+   flex: 1;
+}
