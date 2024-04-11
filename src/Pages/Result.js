@@ -54,6 +54,8 @@ function Result(props) {
 
   const [result, setResults] = useState([]);
   const [data, setData] = useState([]);
+  const [average, setAverage] = useState([]);
+
 
   //change this later
 
@@ -140,8 +142,53 @@ const stuclass = stuInfo?.data?.matriculationNumber?.slice(3, 8);
       setResErr(true);
     }
   };
-  // https://ulego.ng/api/v1/course/student/report/02bb1fc9-590c-4087-9452-fdb2f99f289a
 
+  function sortByAverageMark(data) {
+    data.sort((a, b) => b.averageMark - a.averageMark);
+    return data;
+  }
+
+  function getPositionFromIndex(index) {
+    const positions = [
+      "1st",
+      "2nd",
+      "3rd",
+      "4th",
+      "5th",
+      // Add more positions as needed
+    ];
+  
+    return positions[index] || `${index + 1}th`;
+  }
+
+  const getAverage = async () => {
+    // e.preventDefault();
+
+    try {
+      let result = await fetch(
+        `https://ulego.ng/api/v1/course/${stuclass}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json ",
+            Accept: "application/json",
+          },
+        }
+      );
+      result = await result.json();
+      const index = sortByAverageMark(result?.data).findIndex(student => student.studentId === Id);
+      const position = getPositionFromIndex(index);
+      setAverage(position)
+      console.log(sortByAverageMark(result?.data));
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+      // setLoading(false);
+      // setOpenResult(true);
+      // setResErr(true);
+    }
+  };
+  // https://ulego.ng/api/v1/course/SSS-2
   const boxRef = useRef(null);
   const handleDownload = async () => {
     const input = boxRef.current;
@@ -160,6 +207,11 @@ const stuclass = stuInfo?.data?.matriculationNumber?.slice(3, 8);
     }
   };
 
+  function sortByAverageMark(data) {
+    data.sort((a, b) => b.averageMark - a.averageMark);
+    return data;
+  }
+
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -169,10 +221,12 @@ const stuclass = stuInfo?.data?.matriculationNumber?.slice(3, 8);
 
   useEffect(() => {
     setLoading(true);
+    // getAverage()
     if (!stuInfo) {
       navigate("/");
     } else {
       getData()
+      getAverage()
     }
   }, []);
 
@@ -341,7 +395,7 @@ const stuclass = stuInfo?.data?.matriculationNumber?.slice(3, 8);
             </MenuItem>
             <MenuItem value={"first-term"}>First Term</MenuItem>
             <MenuItem value={"second-term"}>Second Term</MenuItem>
-            <MenuItem value={"third-term"}>Thir Term</MenuItem>
+            <MenuItem value={"third-term"}>Third Term</MenuItem>
           </Select>
           <FormHelperText>Select Term To View Result</FormHelperText>
         </FormControl>
@@ -571,6 +625,26 @@ const stuclass = stuInfo?.data?.matriculationNumber?.slice(3, 8);
                             >
                               
                               {stuclass}
+                            </Typography>
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontSize: "20px",
+                              fontWeight: "600",
+                              color: "#04337a",
+                            }}
+                          >
+                            Position :{" "}
+                            <Typography
+                              variant="span"
+                              sx={{
+                                fontSize: "18px",
+                                fontWeight: "400",
+                                width: "300px",
+                                paddingBottom: "5px",
+                              }}
+                            >
+                              {average}
                             </Typography>
                           </Typography>
                         </Box>
